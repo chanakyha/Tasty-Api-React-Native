@@ -1,11 +1,12 @@
 import { StyleSheet, View, SafeAreaView, TextInput } from "react-native";
 import React, { useState } from "react";
 import { Button, Text } from "react-native-elements";
+import { auth } from "../utils/firebase";
 
 const RegisterScreen = ({ navigation }) => {
   const [loaderState, setLoaderState] = useState({
-    login: false,
     register: false,
+    login: false,
   });
 
   const [inputDetails, setInputDetails] = useState({
@@ -15,7 +16,40 @@ const RegisterScreen = ({ navigation }) => {
     password: "",
   });
 
-  const onRegisterBtn = () => {
+  const onRegisterUser = () => {
+    setLoaderState({ ...loaderState, register: true });
+    auth
+      .createUserWithEmailAndPassword(inputDetails.email, inputDetails.password)
+      .then((userCredentials) => {
+        let user = userCredentials.user;
+        user
+          .updateProfile({
+            displayName: inputDetails.name,
+            photoURL: inputDetails.avatar,
+          })
+          .then(() => {
+            setInputDetails({
+              name: "",
+              avatar: "",
+              email: "",
+              password: "",
+            });
+            setLoaderState({ ...loaderState, register: false });
+
+            alert("Thank You For Registering with Us");
+          })
+          .catch((error) => {
+            alert(error.message);
+            setLoaderState({ ...loaderState, register: false });
+          });
+      })
+      .catch((error) => {
+        alert(error.message);
+        setLoaderState({ ...loaderState, register: false });
+      });
+  };
+
+  const onBackToLogin = () => {
     setLoaderState({ ...loaderState, login: true });
     navigation.navigate("Login");
     setLoaderState({ ...loaderState, login: false });
@@ -28,10 +62,35 @@ const RegisterScreen = ({ navigation }) => {
           Register
         </Text>
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} placeholder="Name" />
-          <TextInput style={styles.input} placeholder="Profile Pic (URL)" />
-          <TextInput style={styles.input} placeholder="Email Address" />
           <TextInput
+            value={inputDetails.name}
+            onChangeText={(text) =>
+              setInputDetails({ ...inputDetails, name: text })
+            }
+            style={styles.input}
+            placeholder="Name"
+          />
+          <TextInput
+            value={inputDetails.avatar}
+            onChangeText={(text) =>
+              setInputDetails({ ...inputDetails, avatar: text })
+            }
+            style={styles.input}
+            placeholder="Profile Pic (URL)"
+          />
+          <TextInput
+            value={inputDetails.email}
+            onChangeText={(text) =>
+              setInputDetails({ ...inputDetails, email: text })
+            }
+            style={styles.input}
+            placeholder="Email Address"
+          />
+          <TextInput
+            value={inputDetails.password}
+            onChangeText={(text) =>
+              setInputDetails({ ...inputDetails, password: text })
+            }
             style={styles.input}
             placeholder="Password"
             secureTextEntry
@@ -40,6 +99,7 @@ const RegisterScreen = ({ navigation }) => {
             loading={loaderState.register}
             title="Sign Up"
             type="solid"
+            onPress={onRegisterUser}
             titleStyle={{ color: "#fff", marginHorizontal: 20 }}
             buttonStyle={{ backgroundColor: "#000" }}
             containerStyle={{ marginTop: 10 }}
@@ -47,6 +107,11 @@ const RegisterScreen = ({ navigation }) => {
               size: "small",
               color: "#fff",
             }}
+            disabled={
+              !inputDetails.name ||
+              !inputDetails.email ||
+              !inputDetails.password
+            }
           />
           <Button
             loading={loaderState.login}
@@ -59,7 +124,7 @@ const RegisterScreen = ({ navigation }) => {
               size: "small",
               color: "#000",
             }}
-            onPress={onRegisterBtn}
+            onPress={onBackToLogin}
           />
         </View>
       </View>
