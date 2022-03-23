@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { auth } from "../utils/firebase";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import MainScreen from "./MainScreen";
+import EachItemDescription from "./EachItemDescription";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,6 +26,11 @@ const HomeScreen = ({ navigation }) => {
         name="Main"
         options={{ headerShown: false }}
         component={MainScreen}
+      />
+      <Stack.Screen
+        name="Item"
+        options={{ headerShown: false }}
+        component={EachItemDescription}
       />
     </Stack.Navigator>
   );

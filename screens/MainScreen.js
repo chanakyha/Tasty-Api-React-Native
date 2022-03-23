@@ -1,6 +1,6 @@
-import { StyleSheet, TextInput, View } from "react-native";
+import { ScrollView, StyleSheet, TextInput, View } from "react-native";
 import React, { useEffect, useState } from "react";
-import { Text } from "react-native-elements";
+import { Text, Image, Avatar, Button } from "react-native-elements";
 
 const autoCompleteData = {
   results: [
@@ -22,7 +22,16 @@ const autoCompleteData = {
   ],
 };
 
-const MainScreen = () => {
+const sampleData = [
+  {
+    thumbnail_url:
+      "https://img.buzzfeed.com/tasty-app-user-assets-prod-us-east-1/recipes/cea2dc5050b64cdcb67186dd002dc558.jpeg",
+    name: "New Year’s Champagne And Citrus Punch As Made By Marley's Menu",
+    yields: "Servings: 4",
+  },
+];
+
+const MainScreen = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [result, setResult] = useState("");
 
@@ -65,7 +74,44 @@ const MainScreen = () => {
           )}
         </View>
       </View>
-      <View style={styles.recipies}></View>
+      <ScrollView style={styles.recipies}>
+        {sampleData ? (
+          sampleData.map((items) => (
+            <View style={styles.eachItemContainer}>
+              <Avatar
+                source={{ uri: items.thumbnail_url }}
+                avatarStyle={{ borderRadius: 8 }}
+                size={164}
+              />
+              <Text
+                style={{
+                  backgroundColor: "whitesmoke",
+                  padding: 10,
+                  margin: 8,
+                  borderRadius: 20,
+                }}
+              >
+                {items.yields}
+              </Text>
+              <Text h4>{items.name}</Text>
+              <Button
+                onPress={() => navigation.navigate("Item")}
+                title="View More.."
+                type="outline"
+                titleStyle={{
+                  color: "grey",
+                  marginHorizontal: 20,
+                }}
+                buttonStyle={{ backgroundColor: "#fff", borderColor: "#fff" }}
+                containerStyle={{ marginTop: 3 }}
+              />
+            </View>
+          ))
+        ) : (
+          <Text>Loading..</Text>
+        )}
+        <View style={{ height: 200 }}></View>
+      </ScrollView>
     </View>
   );
 };
@@ -83,7 +129,14 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   searchResults: {},
-  recipies: {
+  recipies: {},
+  eachItemContainer: {
+    display: "flex",
+    alignItems: "center",
     backgroundColor: "#fff",
+    margin: 20,
+    padding: 20,
+    borderRadius: 10,
+    elevation: 10,
   },
 });
