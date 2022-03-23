@@ -4,6 +4,7 @@ import HomeScreen from "./screens/HomeScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
+import LogoTitle from "./components/LogoTitle";
 
 const Stack = createNativeStackNavigator();
 LogBox.ignoreAllLogs();
@@ -22,7 +23,13 @@ export default function App() {
           options={{ headerShown: false }}
           component={RegisterScreen}
         />
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen
+          options={{
+            headerTitle: (props) => <LogoTitle {...props} />,
+          }}
+          name="Home"
+          component={HomeScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,12 +1,41 @@
 import { StyleSheet, View, SafeAreaView, TextInput } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Text } from "react-native-elements";
+import { auth } from "../utils/firebase";
 
 const LoginScreen = ({ navigation }) => {
+  useEffect(() => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        navigation.replace("Home");
+      }
+    });
+  }, []);
+
   const [loaderState, setLoaderState] = useState({
     login: false,
     register: false,
   });
+
+  const [userInput, setUserInput] = useState({
+    email: "",
+    password: "",
+  });
+
+  onUserLogin = () => {
+    setLoaderState({ ...loaderState, login: true });
+    auth
+      .signInWithEmailAndPassword(userInput.email, userInput.password)
+      .then((userCredentials) => {
+        let user = userCredentials.user;
+        setUserInput({ email: "", password: "" });
+        setLoaderState({ ...loaderState, login: false });
+      })
+      .catch((error) => {
+        alert(error.message);
+        setLoaderState({ ...loaderState, login: false });
+      });
+  };
 
   const onRegisterBtn = () => {
     setLoaderState({ ...loaderState, register: true });
@@ -21,8 +50,17 @@ const LoginScreen = ({ navigation }) => {
           Login
         </Text>
         <View style={styles.inputContainer}>
-          <TextInput style={styles.input} placeholder="Email Address" />
           <TextInput
+            value={userInput.email}
+            onChangeText={(text) => setUserInput({ ...userInput, email: text })}
+            style={styles.input}
+            placeholder="Email Address"
+          />
+          <TextInput
+            value={userInput.password}
+            onChangeText={(text) =>
+              setUserInput({ ...userInput, password: text })
+            }
             style={styles.input}
             placeholder="Password"
             secureTextEntry
@@ -31,6 +69,7 @@ const LoginScreen = ({ navigation }) => {
             loading={loaderState.login}
             title="Login"
             type="solid"
+            onPress={onUserLogin}
             titleStyle={{ color: "#fff", marginHorizontal: 20 }}
             buttonStyle={{ backgroundColor: "#000" }}
             containerStyle={{ marginTop: 10 }}
@@ -38,6 +77,7 @@ const LoginScreen = ({ navigation }) => {
               size: "small",
               color: "#fff",
             }}
+            disabled={!userInput.email || !userInput.password}
           />
           <Button
             loading={loaderState.register}
@@ -78,6 +118,7 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    elevation: 4,
   },
   input: {
     backgroundColor: "whitesmoke",

@@ -1,12 +1,50 @@
-import { StyleSheet, View } from "react-native";
-import React from "react";
+import { Alert, StyleSheet, View } from "react-native";
+import React, { useEffect, useState } from "react";
 import { Avatar, Text } from "react-native-elements";
+import { auth } from "../utils/firebase";
 
 const LogoTitle = () => {
+  const [userDetails, setUserDetails] = useState({});
+
+  useEffect(() => {
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUserDetails(user);
+      }
+    });
+  }, []);
+
+  const onSignOut = () => {
+    Alert.alert("Sign Out", "Do you want to Sign Out", [
+      { text: "No" },
+      {
+        text: "Yes",
+        onPress: () => {
+          auth.signOut();
+        },
+      },
+    ]);
+  };
   return (
     <View style={styles.container}>
       <Text h4>Tasty Recipies</Text>
-      <Avatar title="H" size={40} rounded containerStyle={styles.avatar} />
+      {userDetails.photoURL ? (
+        <Avatar
+          source={{ uri: userDetails.photoURL || "" }}
+          size={40}
+          rounded
+          containerStyle={styles.avatar}
+          onLongPress={onSignOut}
+        />
+      ) : (
+        <Avatar
+          title={userDetails.displayName ? userDetails.displayName[0] : "NA"}
+          size={40}
+          rounded
+          containerStyle={styles.avatar}
+          onLongPress={onSignOut}
+        />
+      )}
     </View>
   );
 };
@@ -22,6 +60,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   avatar: {
-    backgroundColor: "coral",
+    backgroundColor: "#000",
   },
 });

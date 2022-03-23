@@ -34,8 +34,8 @@ const RegisterScreen = ({ navigation }) => {
               email: "",
               password: "",
             });
+            navigation.navigate("Login");
             setLoaderState({ ...loaderState, register: false });
-
             alert("Thank You For Registering with Us");
           })
           .catch((error) => {
